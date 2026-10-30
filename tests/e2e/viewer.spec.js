@@ -55,7 +55,7 @@ for (const theme of THEMES) {
       await expect(page.locator('#fontSub')).toHaveText('Waiting for a font file.');
       await expect(page.locator('#fontFile')).toBeHidden();
       await expect(page.locator('.stats dd')).toHaveText(['—', '—', '—', '—']);
-      await expect(page.locator('#resultCount')).toHaveText('—');
+      await expect(page.locator('#resultCount')).toBeHidden();
       await expect(page.locator('#grid')).toBeHidden();
       await expect(page.locator('.glyph-card')).toHaveCount(0);
       await expect(page.locator('#searchInput')).toBeDisabled();

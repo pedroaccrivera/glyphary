@@ -191,7 +191,8 @@ export const start = async () => {
     els.statUpem.textContent = '—';
     els.statMetrics.textContent = '—';
     els.statFormat.textContent = '—';
-    els.resultCount.textContent = '—';
+    els.resultCount.textContent = '';
+    els.resultCount.hidden = true;
     els.searchInput.value = '';
     els.clearSearch.hidden = true;
     els.limitNote.hidden = true;
@@ -256,6 +257,7 @@ export const start = async () => {
     els.clearSearch.hidden = true;
     els.grid.hidden = false;
     els.welcome.hidden = true;
+    els.resultCount.hidden = false;
     setControlsEnabled(true);
     setSort('file', false);
     applySize();
