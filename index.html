@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en" data-theme="light" data-theme-mode="auto">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f4f2ec" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#14130f" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="description"
+      content="Glyphary is a local icon font viewer: drop an SVG font, WOFF, WOFF2, TTF or OTF and copy the CSS for every glyph."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='7'%20fill='%23fffdf8'%20stroke='%23c2bdb0'/%3E%3Cg%20fill='%231b1a17'%3E%3Crect%20x='8'%20y='8'%20width='4'%20height='4'/%3E%3Crect%20x='14'%20y='8'%20width='4'%20height='4'/%3E%3Crect%20x='20'%20y='8'%20width='4'%20height='4'/%3E%3Crect%20x='8'%20y='14'%20width='4'%20height='4'/%3E%3Crect%20x='14'%20y='14'%20width='4'%20height='4'%20fill='%23d94a16'/%3E%3Crect%20x='20'%20y='14'%20width='4'%20height='4'/%3E%3Crect%20x='8'%20y='20'%20width='4'%20height='4'/%3E%3Crect%20x='14'%20y='20'%20width='4'%20height='4'/%3E%3Crect%20x='20'%20y='20'%20width='4'%20height='4'/%3E%3C/g%3E%3C/svg%3E"
+    />
+    <title>Glyphary — icon font viewer</title>
+
+    <!-- Resolve the theme before the first paint to avoid a flash of the wrong palette. -->
+    <script>
+      (function () {
+        var MODES = ['auto', 'light', 'dark'];
+        function normalize(value) {
+          return MODES.indexOf(value) === -1 ? null : value;
+        }
+        var mode = null;
+        try {
+          mode = normalize(new URLSearchParams(window.location.search).get('theme'));
+          if (!mode) mode = normalize(window.localStorage.getItem('glyphary:theme'));
+        } catch (error) {
+          mode = null;
+        }
+        if (!mode) mode = 'auto';
+        var prefersDark = false;
+        try {
+          prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        } catch (error) {
+          prefersDark = false;
+        }
+        var root = document.documentElement;
+        root.dataset.themeMode = mode;
+        root.dataset.theme = mode === 'dark' || (mode === 'auto' && prefersDark) ? 'dark' : 'light';
+      })();
+    </script>
+
+    <!-- build:css -->
+    <!-- /build:css -->
+  </head>
+
+  <body>
+    <a class="skip" href="#grid">Skip to glyphs</a>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span
+          ><span></span>
+        </span>
+        <div class="brand-text">
+          <span class="brand-name">Glyphary</span>
+          <span class="brand-tag">icon font reader</span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button
+          id="themeBtn"
+          class="btn ghost theme-btn"
+          type="button"
+          data-mode="auto"
+          aria-label="Theme: Auto"
+          title="Theme: Auto"
+        >
+          <svg class="theme-icon" data-icon="auto" viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.4" />
+            <path d="M8 1.8v12.4a6.2 6.2 0 0 0 0-12.4Z" fill="currentColor" />
+          </svg>
+          <svg class="theme-icon" data-icon="light" viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="8" cy="8" r="3.1" fill="currentColor" />
+            <g stroke="currentColor" stroke-width="1.4" stroke-linecap="round">
+              <path
+                d="M8 1.2v1.9M8 12.9v1.9M1.2 8h1.9M12.9 8h1.9M3.2 3.2l1.4 1.4M11.4 11.4l1.4 1.4M12.8 3.2l-1.4 1.4M4.6 11.4l-1.4 1.4"
+              />
+            </g>
+          </svg>
+          <svg class="theme-icon" data-icon="dark" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M13.4 9.8A6.1 6.1 0 0 1 6.2 2.6a6.2 6.2 0 1 0 7.2 7.2Z" fill="currentColor" />
+          </svg>
+          <span class="btn-label theme-label" id="themeLabel">Auto</span>
+        </button>
+
+        <span class="local-pill"><span class="dot"></span>100% local</span>
+
+        <button
+          id="openBtn"
+          class="btn primary"
+          type="button"
+          aria-label="Open font"
+          title="Accepts .svg, .woff, .woff2, .ttf and .otf"
+        >
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M8 11V2.4" />
+            <path d="M4.9 5.4 8 2.3l3.1 3.1" />
+            <path d="M2.4 10.2v2.6a1 1 0 0 0 1 1h9.2a1 1 0 0 0 1-1v-2.6" />
+          </svg>
+          <span class="btn-label">Open font</span>
+        </button>
+
+        <input
+          id="fileInput"
+          type="file"
+          accept=".svg,.woff,.woff2,.ttf,.otf,image/svg+xml,font/woff,font/woff2,font/ttf,font/otf"
+          hidden
+        />
+      </div>
+    </header>
+
+    <section class="specimen" aria-labelledby="fontName">
+      <div class="specimen-info">
+        <p class="eyebrow"><span class="status-dot"></span>Displayed font</p>
+        <h1 id="fontName">No font loaded</h1>
+        <p class="sub" id="fontSub">Waiting for a font file.</p>
+        <p class="source" id="fontFile" hidden></p>
+        <p class="drop-hint">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M8 10.5V2.7" />
+            <path d="m5.3 5.4 2.7-2.7 2.7 2.7" />
+            <path d="M2.8 9.7v2.2a1.2 1.2 0 0 0 1.2 1.2h8a1.2 1.2 0 0 0 1.2-1.2V9.7" />
+          </svg>
+          Drag a <code>.svg</code> <code>.woff</code> <code>.woff2</code> <code>.ttf</code> <code>.otf</code> file or
+          use
+          <strong>Open font</strong>
+        </p>
+      </div>
+
+      <dl class="stats" aria-label="Font metrics">
+        <div>
+          <dt>Glyphs</dt>
+          <dd id="statGlyphs">—</dd>
+        </div>
+        <div>
+          <dt title="Units per em">UPM</dt>
+          <dd id="statUpem">—</dd>
+        </div>
+        <div>
+          <dt title="Ascent / descent">Asc / desc</dt>
+          <dd id="statMetrics">—</dd>
+        </div>
+        <div>
+          <dt>Format</dt>
+          <dd id="statFormat">—</dd>
+        </div>
+      </dl>
+    </section>
+
+    <div class="toolbar">
+      <div class="toolbar-inner">
+        <div class="search-wrap">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <circle cx="7.1" cy="7.1" r="4.6" />
+            <path d="m10.6 10.6 3 3" />
+          </svg>
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search name, code or U+E900…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search glyphs"
+            disabled
+          />
+          <kbd>/</kbd>
+          <button id="clearSearch" class="clear-btn" type="button" aria-label="Clear search" hidden>×</button>
+        </div>
+
+        <div class="toolbar-controls">
+          <span id="resultCount" class="result-count" aria-live="polite">—</span>
+
+          <div class="segmented" role="group" aria-label="Sort glyphs">
+            <button type="button" data-sort="file" class="active" aria-pressed="true" disabled>File</button>
+            <button type="button" data-sort="name" aria-pressed="false" disabled>Name</button>
+            <button type="button" data-sort="code" aria-pressed="false" disabled>Code</button>
+          </div>
+
+          <label class="range-wrap" for="sizeRange">
+            <span>Size</span>
+            <input
+              id="sizeRange"
+              type="range"
+              min="20"
+              max="64"
+              step="2"
+              value="32"
+              aria-label="Glyph size in pixels"
+              disabled
+            />
+            <output id="sizeOut" for="sizeRange">32 px</output>
+          </label>
+
+          <button id="cssBtn" class="btn ghost small" type="button" disabled>
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 2.5c-1.6 0-2 .7-2 2.1v1.2c0 1-.5 1.5-1.5 1.7 1 .2 1.5.7 1.5 1.7v1.2c0 1.4.4 2.1 2 2.1" />
+              <path d="M10 2.5c1.6 0 2 .7 2 2.1v1.2c0 1 .5 1.5 1.5 1.7-1 .2-1.5.7-1.5 1.7v1.2c0 1.4-.4 2.1-2 2.1" />
+            </svg>
+            CSS
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <main class="content">
+      <div id="errorBox" class="error" role="alert" hidden>
+        <div>
+          <strong>Could not read the font</strong>
+          <p id="errorMsg"></p>
+        </div>
+        <button id="closeError" class="clear-btn" type="button" aria-label="Dismiss notice">×</button>
+      </div>
+
+      <section id="welcome" class="welcome" aria-labelledby="welcomeTitle">
+        <div class="welcome-copy">
+          <p class="eyebrow"><span class="status-dot"></span>Start here</p>
+          <h2 id="welcomeTitle">Open a font to begin.</h2>
+          <p class="welcome-lead">
+            Glyphary reads icon fonts entirely in your browser, then turns every glyph into a specimen with its code
+            point, class name and CSS rule.
+          </p>
+          <div class="welcome-actions">
+            <button id="welcomeOpen" class="btn primary welcome-cta" type="button">
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M8 11V2.4" />
+                <path d="M4.9 5.4 8 2.3l3.1 3.1" />
+                <path d="M2.4 10.2v2.6a1 1 0 0 0 1 1h9.2a1 1 0 0 0 1-1v-2.6" />
+              </svg>
+              Open font
+            </button>
+            <span class="welcome-formats">
+              <code>.svg</code>
+              <code>.woff</code>
+              <code>.woff2</code>
+              <code>.ttf</code>
+              <code>.otf</code>
+            </span>
+          </div>
+          <p class="welcome-privacy">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true">
+              <rect x="3" y="7" width="10" height="7" rx="1.4" />
+              <path d="M5.4 7V5.2a2.6 2.6 0 0 1 5.2 0V7" />
+            </svg>
+            Nothing is uploaded. Your font file never leaves this browser.
+          </p>
+        </div>
+        <div class="welcome-art" aria-hidden="true">
+          <span class="welcome-art-label">Drop a font anywhere</span>
+          <span class="welcome-art-glyph">Aa</span>
+          <span class="welcome-art-foot">svg · woff · woff2 · ttf · otf</span>
+        </div>
+      </section>
+
+      <div id="grid" class="grid" aria-busy="false" hidden></div>
+
+      <div id="empty" class="empty" hidden>
+        <p class="empty-title">Nothing here.</p>
+        <p>No glyph matches <strong id="emptyQuery"></strong>.</p>
+        <button id="emptyClear" class="btn ghost" type="button">Clear search</button>
+      </div>
+
+      <p id="limitNote" class="limit-note" hidden></p>
+    </main>
+
+    <footer class="footer">
+      <p>Glyphary · local processing. No file leaves your browser.</p>
+      <p class="shortcuts">/ search &nbsp;·&nbsp; ← → navigate &nbsp;·&nbsp; esc close</p>
+      <p>Parsing by <a href="https://github.com/foliojs/fontkit" target="_blank" rel="noreferrer">fontkit</a> · MIT</p>
+    </footer>
+
+    <dialog id="drawer" class="drawer" aria-labelledby="drawerTitle">
+      <div class="drawer-head">
+        <div>
+          <p class="eyebrow" id="drawerIndex">GLYPH — / —</p>
+          <div class="drawer-title-row">
+            <h2 id="drawerTitle">—</h2>
+            <span id="variantBadge" class="badge" hidden></span>
+          </div>
+        </div>
+        <div class="drawer-nav">
+          <button id="prevBtn" class="icon-btn" type="button" aria-label="Previous glyph" title="Previous glyph (←)">
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m9.8 3.5-4.5 4.5 4.5 4.5" />
+            </svg>
+          </button>
+          <button id="nextBtn" class="icon-btn" type="button" aria-label="Next glyph" title="Next glyph (→)">
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="m6.2 3.5 4.5 4.5-4.5 4.5" />
+            </svg>
+          </button>
+          <button id="closeDrawer" class="icon-btn" type="button" aria-label="Close details">
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              aria-hidden="true"
+            >
+              <path d="m4 4 8 8M12 4l-8 8" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="drawer-body">
+        <div id="preview" class="preview" aria-hidden="true"></div>
+
+        <div class="code-card">
+          <div class="code-head">
+            <span>CSS</span>
+            <button id="copyRule" type="button">Copy</button>
+          </div>
+          <code id="cssRule">—</code>
+        </div>
+
+        <dl id="meta" class="meta"></dl>
+
+        <div class="drawer-actions">
+          <button id="copyChar" class="btn primary" type="button">Copy character</button>
+          <button id="downloadSvg" class="btn ghost" type="button">
+            <svg
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M8 2.5v8.6" />
+              <path d="m4.9 8 3.1 3.1L11.1 8" />
+              <path d="M2.4 10.8v1.9a1 1 0 0 0 1 1h9.2a1 1 0 0 0 1-1v-1.9" />
+            </svg>
+            Download SVG
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="cssDialog" class="modal" aria-labelledby="cssTitle">
+      <div class="modal-head">
+        <div>
+          <h2 id="cssTitle">Export CSS</h2>
+          <p class="modal-sub" id="cssMeta">—</p>
+        </div>
+        <button id="closeCss" class="icon-btn" type="button" aria-label="Close export">
+          <svg
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="m4 4 8 8M12 4l-8 8" />
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="prefix-row">
+          <label for="prefixInput">Class prefix</label>
+          <input
+            id="prefixInput"
+            class="prefix-input"
+            type="text"
+            value="icon"
+            maxlength="32"
+            spellcheck="false"
+            autocomplete="off"
+            placeholder="icon"
+          />
+        </div>
+        <p class="hint">
+          Rules use the code points of the loaded file. Include the original <code>@font-face</code> in your project.
+        </p>
+        <pre class="code-output"><code id="cssOutput">—</code></pre>
+      </div>
+
+      <div class="modal-foot">
+        <div class="right">
+          <button id="downloadCsv" class="btn ghost" type="button">Download CSV</button>
+          <button id="downloadCss" class="btn ghost" type="button">Download .css</button>
+        </div>
+        <button id="copyCss" class="btn primary" type="button">Copy CSS</button>
+      </div>
+    </dialog>
+
+    <div id="dropOverlay" class="drop-overlay" aria-hidden="true">
+      <div class="drop-card">
+        <div class="drop-icon">↓</div>
+        <p class="drop-title">Drop the font here</p>
+        <p class="drop-sub">.svg · .woff · .woff2 · .ttf · .otf</p>
+      </div>
+    </div>
+
+    <div id="busyBar" class="busy-bar" hidden></div>
+    <div id="toast" class="toast" popover="manual" role="status" aria-live="polite"></div>
+
+    <!-- build:js -->
+    <script type="module" src="./src/main.js"></script>
+    <!-- /build:js -->
+  </body>
+</html>

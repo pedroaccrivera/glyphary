@@ -1,0 +1,45 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+
+      - run: npm ci
+
+      - name: Verify
+        run: |
+          npm run lint
+          npm run test:unit
+          npm run build
+
+      - name: Publish the standalone viewer as a release asset
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/glyphary.html
+          generate_release_notes: true
+
+      # Private registries are opt-in: uncomment and set the scope in package.json
+      # (e.g. "name": "@your-org/glyphary") plus a token with write access.
+      # - name: Publish to the private registry
+      #   if: startsWith(github.ref, 'refs/tags/')
+      #   run: npm publish
+      #   env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

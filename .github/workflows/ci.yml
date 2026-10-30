@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint and formatting
+        run: |
+          npm run lint
+          npm run format:check
+
+      - name: Unit tests
+        run: npm run test:unit
+
+      - name: Build the standalone viewer
+        run: npm run build
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+        env:
+          PLAYWRIGHT_CHANNEL: chrome
+
+      - name: Store the shareable artifact
+        if: matrix.node == 20
+        uses: actions/upload-artifact@v4
+        with:
+          name: glyphary
+          path: dist/glyphary.html
+          if-no-files-found: error
+
+      - name: Store failure artefacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-node${{ matrix.node }}
+          path: |
+            playwright-report
+            test-results
+          if-no-files-found: ignore
