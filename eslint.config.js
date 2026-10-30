@@ -3,15 +3,7 @@ import globals from 'globals';
 
 export default [
   {
-    ignores: [
-      'node_modules/**',
-      'dist/**',
-      'build/**',
-      'playwright-report/**',
-      'test-results/**',
-      'src/assets/default-font.js',
-      'src/assets/fontkit.bundle.js',
-    ],
+    ignores: ['node_modules/**', 'dist/**', 'build/**', 'playwright-report/**', 'test-results/**'],
   },
   js.configs.recommended,
   {

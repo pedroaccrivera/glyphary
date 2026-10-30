@@ -1,8 +1,6 @@
 dist/
 build/
 node_modules/
-src/assets/default-font.js
 playwright-report/
 test-results/
 _shot-*.png
-examples/
