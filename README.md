@@ -44,6 +44,9 @@ npm install
 npm run dev          # http://localhost:5173 with hot reload
 ```
 
+Node 22 or newer is required (Node 20 is end-of-life and cannot run the test
+toolchain).
+
 Open the app, click **Open font** (or drop a file anywhere), and pick an icon font.
 
 ## Build the shareable file
