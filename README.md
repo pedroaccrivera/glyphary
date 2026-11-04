@@ -133,32 +133,35 @@ code-signing certificate) can be added later without changing the app.
 | ---------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Desktop app      | `npm run desktop:build`                             | macOS `.dmg` and Windows `.msi`/`.exe`; no browser, no Node                                  |
 | Single HTML file | `npm run build`, then share `dist/glyphary.html`    | Zero install; Slack, Drive, a GitHub Release asset                                           |
-| Tarball          | `npm pack` → `glyphary-0.1.1.tgz`                   | Teammates run `npx ./glyphary-0.1.1.tgz`, or `npm i -g ./glyphary-0.1.1.tgz` then `glyphary` |
+| Tarball          | `npm pack` → `glyphary-0.2.0.tgz`                   | Teammates run `npx ./glyphary-0.2.0.tgz`, or `npm i -g ./glyphary-0.2.0.tgz` then `glyphary` |
 | Private registry | `npm publish` (see `.github/workflows/release.yml`) | Versioned installs from GitHub Packages or an internal registry                              |
 
 ```bash
 npm pack                       # creates the tarball, prints its name
-npx ./glyphary-0.1.1.tgz        # run it straight from the tarball
-npm i -g ./glyphary-0.1.1.tgz   # or install the `glyphary` command globally
+npx ./glyphary-0.2.0.tgz        # run it straight from the tarball
+npm i -g ./glyphary-0.2.0.tgz   # or install the `glyphary` command globally
 glyphary --serve                # serve the viewer locally
 ```
 
 ## Versioning
 
-Versions start at `0.1.0` and every release bumps the patch: `0.1.1`, `0.1.2` and
-so on. A tag is always `v` plus that version.
+Versions start at `0.1.0`; the first desktop release is `0.2.0`. After that,
+`npm run release` bumps the patch (`0.2.1`, `0.2.2` and so on) and
+`npm run release -- minor` opens a new minor line. A tag is always `v` plus that
+version.
 
 ```bash
-npm run release   # bumps the patch, commits, tags vX.Y.Z and pushes
+npm run release          # patch bump, commits, tags vX.Y.Z and pushes
+npm run release -- minor # feature release, e.g. 0.2.0
 ```
 
-That runs `scripts/release.mjs`: it refuses a dirty tree, bumps the patch with
-`npm version patch --no-git-tag-version`, syncs `src-tauri/Cargo.toml` and
-`Cargo.lock`, commits `Release X.Y.Z`, tags `vX.Y.Z` and pushes with
-`--follow-tags`. The tag triggers `.github/workflows/release.yml`, which checks
-the tag against `package.json` with `scripts/check-version.mjs`, publishes
-`dist/glyphary.html`, builds the three desktop targets and attaches the
-installers to the same GitHub Release.
+That runs `scripts/release.mjs`: it refuses a dirty tree, bumps with
+`npm version <patch|minor|major> --no-git-tag-version`, syncs
+`src-tauri/Cargo.toml` and `Cargo.lock`, commits `Release X.Y.Z`, tags `vX.Y.Z`
+and pushes with `--follow-tags`. The tag triggers
+`.github/workflows/release.yml`, which checks the tag against `package.json`
+with `scripts/check-version.mjs`, publishes `dist/glyphary.html`, builds the
+three desktop targets and attaches the installers to the same GitHub Release.
 
 ## Using it
 
