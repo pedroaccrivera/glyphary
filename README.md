@@ -44,8 +44,12 @@ npm install
 npm run dev          # http://localhost:5173 with hot reload
 ```
 
-Node 22 or newer is required (Node 20 is end-of-life and cannot run the test
-toolchain).
+Node 24 LTS is recommended (`.nvmrc` pins `24`; run `nvm use`). The supported
+versions are `^22.22.2`, `^24.15.0` and `>=26.0.0` — the range required by the
+test toolchain (Vitest 5, jsdom 30). Odd-numbered releases such as Node 25 are
+not supported: `npm install` prints `EBADENGINE` warnings there because Vitest
+and jsdom are not tested against them. Node 20 is end-of-life and cannot run the
+toolchain at all.
 
 Open the app, click **Open font** (or drop a file anywhere), and pick an icon font.
 

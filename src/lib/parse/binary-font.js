@@ -38,7 +38,7 @@ export const parseBinaryFont = (buffer, filename) => {
     const bbox = glyph.bbox || null;
     if (bbox && bbox.maxX === bbox.minX && bbox.maxY === bbox.minY) continue;
 
-    let d = '';
+    let d;
     try {
       d = glyph.path && glyph.path.toSVG();
     } catch (error) {
