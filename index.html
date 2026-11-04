@@ -16,6 +16,14 @@
     />
     <title>Glyphary — icon font viewer</title>
 
+    <!-- Inside Tauri on macOS the title bar is overlaid on the top bar, so the
+         traffic lights sit in the app header. Mark the document for the CSS. -->
+    <script>
+      if (window.__TAURI_INTERNALS__ && navigator.userAgent.includes('Macintosh')) {
+        document.documentElement.dataset.windowChrome = 'macos';
+      }
+    </script>
+
     <!-- Resolve the theme before the first paint to avoid a flash of the wrong palette. -->
     <script>
       (function () {
@@ -50,7 +58,7 @@
   <body>
     <a class="skip" href="#grid">Skip to glyphs</a>
 
-    <header class="topbar">
+    <header class="topbar" data-tauri-drag-region="deep">
       <div class="brand">
         <span class="mark" aria-hidden="true">
           <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span

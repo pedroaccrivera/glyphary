@@ -79,6 +79,15 @@ button {
   justify-content: space-between;
   gap: 24px;
   border-bottom: 1px solid var(--line);
+  user-select: none;
+}
+/* macOS desktop: the traffic lights are overlaid on the top bar, so leave room
+   for them and use the rest of the bar as the window drag handle. */
+html[data-window-chrome='macos'] .topbar {
+  padding-left: 96px;
+}
+html[data-window-chrome='macos'] .skip {
+  left: 96px;
 }
 .brand {
   display: flex;
@@ -1237,6 +1246,9 @@ body.dragging {
   .topbar {
     height: 58px;
     padding: 0 18px;
+  }
+  html[data-window-chrome='macos'] .topbar {
+    padding-left: 86px;
   }
   .local-pill {
     display: none;
