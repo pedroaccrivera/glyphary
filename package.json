@@ -1,6 +1,6 @@
 {
   "name": "glyphary",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Local icon font viewer: drop an SVG font, WOFF, WOFF2, TTF or OTF and read every glyph, code point and CSS rule.",
   "type": "module",
   "license": "MIT",
