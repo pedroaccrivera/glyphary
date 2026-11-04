@@ -22,9 +22,9 @@ export const STRINGS = {
   welcome: {
     eyebrow: 'Start here',
     title: 'Open a font to begin.',
-    lead: 'Glyphary reads icon fonts entirely in your browser, then turns every glyph into a specimen with its code point, class name and CSS rule.',
+    lead: 'Glyphary reads icon fonts entirely on your device, then turns every glyph into a specimen with its code point, class name and CSS rule.',
     action: 'Open font',
-    privacy: 'Nothing is uploaded. Your font file never leaves this browser.',
+    privacy: 'Nothing is uploaded. Your font file never leaves this device.',
     artLabel: 'Drop a font anywhere',
     artFoot: 'svg · woff · woff2 · ttf · otf',
   },
@@ -132,6 +132,7 @@ export const STRINGS = {
     copyFailed: 'Could not copy',
     loaded: (family, count) => family + ' · ' + count + ' glyphs',
     readFailed: 'Could not read the font',
+    saveFailed: 'Could not save the file',
     busy: 'Wait for the current read to finish.',
   },
 

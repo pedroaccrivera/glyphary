@@ -55,3 +55,30 @@ jobs:
             playwright-report
             test-results
           if-no-files-found: ignore
+
+  desktop:
+    # The full macOS/Windows matrix runs for tags in release.yml. Compiling the
+    # app here catches Rust and packaging regressions on every push without
+    # paying for three macOS/Windows VMs.
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-darwin
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+          key: aarch64-apple-darwin
+
+      - run: npm ci
+
+      - name: Compile the desktop app
+        run: npm run desktop:build -- --target aarch64-apple-darwin --debug --no-bundle

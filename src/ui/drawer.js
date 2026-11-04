@@ -84,7 +84,9 @@ export const createDrawer = (ctx) => {
     const glyph = state.glyphs[state.selected];
     if (!glyph) return;
     const name = ctx.fileBase() + '-' + glyph.slug + '.svg';
-    downloadText(name, generateGlyphSvg(glyph, ctx.metrics()), 'image/svg+xml;charset=utf-8');
+    downloadText(name, generateGlyphSvg(glyph, ctx.metrics()), 'image/svg+xml;charset=utf-8').catch(() => {
+      ctx.ui.toast.show(STRINGS.toast.saveFailed, true);
+    });
   };
 
   return { open, step, fill, close, downloadSvg, scrollTop };

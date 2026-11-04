@@ -35,10 +35,16 @@ export const createCssDialog = (ctx) => {
 
   const css = () => generateCss(state.glyphs, state.family, ctx.prefix());
 
+  const save = (filename, text, mime) => {
+    downloadText(filename, text, mime).catch(() => {
+      ctx.ui.toast.show(STRINGS.toast.saveFailed, true);
+    });
+  };
+
   return { open, close, update, css, downloadCss, downloadCsv };
 
   function downloadCss() {
-    downloadText(
+    save(
       ctx.fileBase() + '-glyphs.css',
       generateCss(state.glyphs, state.family, ctx.prefix()),
       'text/css;charset=utf-8',
@@ -46,6 +52,6 @@ export const createCssDialog = (ctx) => {
   }
 
   function downloadCsv() {
-    downloadText(ctx.fileBase() + '-glyphs.csv', generateCsv(state.glyphs, ctx.prefix()), 'text/csv;charset=utf-8');
+    save(ctx.fileBase() + '-glyphs.csv', generateCsv(state.glyphs, ctx.prefix()), 'text/csv;charset=utf-8');
   }
 };

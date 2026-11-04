@@ -1,6 +1,11 @@
 node_modules/
 dist/
 build/
+src-tauri/target/
+src-tauri/frontend/
+src-tauri/gen/
+src-tauri/icons/ios/
+src-tauri/icons/android/
 playwright-report/
 test-results/
 *.log

@@ -4,7 +4,7 @@
 
 **Open an icon font, read every glyph, code point and CSS rule.**
 
-Runs entirely in the browser — no uploads, no server, no font bundled in.
+Runs entirely on your machine — no uploads, no server, no font bundled in.
 
 `SVG font` · `WOFF` · `WOFF2` · `TTF` · `OTF` · light & dark themes
 
@@ -30,10 +30,11 @@ every glyph into a specimen you can inspect and export.
 
 ## Privacy
 
-Fonts are read with the browser's `FileReader`/`ArrayBuffer` APIs and parsed in the
-page. There is no network request, no analytics, no service worker and no backend.
-The standalone HTML file works offline from `file://`. You can verify this in the
-browser's Network panel: opening a font produces no requests.
+Fonts are read with the `FileReader`/`ArrayBuffer` APIs and parsed in the page,
+including the desktop webview. There is no network request, no analytics, no
+service worker and no backend. The standalone HTML file works offline from
+`file://`. You can verify this in the browser's Network panel: opening a font
+produces no requests.
 
 ## Quick start
 
@@ -70,10 +71,67 @@ npm run serve        # or serve it on http://localhost:4321
 node bin/glyphary.mjs --help
 ```
 
+## Desktop app
+
+The same viewer ships as a native window through [Tauri](https://tauri.app),
+with no browser tab and no Node install. The window loads exactly the
+`dist/glyphary.html` bundle built above, so the browser artifact and the desktop
+app share one rendering path. The CSS, CSV and glyph SVG exports open the
+native save dialog instead of a browser download.
+
+The first release targets **macOS arm64**, **macOS x64** and **Windows x64**.
+Linux is not bundled yet. The release workflow builds the three installers and
+attaches them to the GitHub Release next to `glyphary.html`.
+
+### Prerequisites
+
+- Node 22.22.2+ (24 LTS recommended) and `npm install`
+- [Rust](https://rustup.rs) stable
+- macOS: Xcode Command Line Tools (`xcode-select --install`); the app runs on macOS 12.3 or newer
+- Windows: the MSVC build tools and WebView2 (preinstalled on current Windows
+  10/11; the installer downloads the runtime when it is missing)
+
+### Run and build
+
+```bash
+npm run desktop:dev     # rebuilds the viewer, then opens the app
+npm run desktop:build   # installers under src-tauri/target/release/bundle/
+```
+
+Both commands rebuild `dist/glyphary.html` and copy it to
+`src-tauri/frontend/index.html` first. Restart `desktop:dev` after changing files
+under `src/`.
+
+Build another architecture by passing its Rust target:
+
+```bash
+npm run desktop:build -- --target aarch64-apple-darwin
+npm run desktop:build -- --target x86_64-apple-darwin
+npm run desktop:build -- --target x86_64-pc-windows-msvc
+```
+
+| Platform | Output                                                                                                   |
+| -------- | -------------------------------------------------------------------------------------------------------- |
+| macOS    | `src-tauri/target/<target>/release/bundle/dmg/Glyphary_<version>_<arch>.dmg`                             |
+| Windows  | `.../bundle/msi/Glyphary_<version>_x64_en-US.msi` and `.../bundle/nsis/Glyphary_<version>_x64-setup.exe` |
+
+The app icon lives in `src-tauri/icons/icon.svg`; `npm run desktop:icon`
+re-renders it and regenerates the native icon set.
+
+### Unsigned builds
+
+The first releases are **not code-signed or notarized**. macOS Gatekeeper
+blocks a downloaded DMG on first launch: open **System Settings → Privacy &
+Security** and choose **Open Anyway**, or right-click the app and pick **Open**.
+On Windows, SmartScreen shows “Windows protected your PC”: choose **More info →
+Run anyway**. Signing (Apple Developer ID plus notarization, and a Windows
+code-signing certificate) can be added later without changing the app.
+
 ## Distribution
 
 | Option           | Command                                             | Good for                                                                                     |
 | ---------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Desktop app      | `npm run desktop:build`                             | macOS `.dmg` and Windows `.msi`/`.exe`; no browser, no Node                                  |
 | Single HTML file | `npm run build`, then share `dist/glyphary.html`    | Zero install; Slack, Drive, a GitHub Release asset                                           |
 | Tarball          | `npm pack` → `glyphary-0.1.1.tgz`                   | Teammates run `npx ./glyphary-0.1.1.tgz`, or `npm i -g ./glyphary-0.1.1.tgz` then `glyphary` |
 | Private registry | `npm publish` (see `.github/workflows/release.yml`) | Versioned installs from GitHub Packages or an internal registry                              |
@@ -94,10 +152,13 @@ so on. A tag is always `v` plus that version.
 npm run release   # bumps the patch, commits, tags vX.Y.Z and pushes
 ```
 
-That runs `npm version patch` (which refuses a dirty working tree) and then
-`git push --follow-tags`. The tag triggers `.github/workflows/release.yml`, which
-checks the tag against `package.json` with `scripts/check-version.mjs` and only
-then attaches `dist/glyphary.html` to the GitHub Release.
+That runs `scripts/release.mjs`: it refuses a dirty tree, bumps the patch with
+`npm version patch --no-git-tag-version`, syncs `src-tauri/Cargo.toml` and
+`Cargo.lock`, commits `Release X.Y.Z`, tags `vX.Y.Z` and pushes with
+`--follow-tags`. The tag triggers `.github/workflows/release.yml`, which checks
+the tag against `package.json` with `scripts/check-version.mjs`, publishes
+`dist/glyphary.html`, builds the three desktop targets and attaches the
+installers to the same GitHub Release.
 
 ## Using it
 
@@ -132,7 +193,14 @@ src/
     grid.js drawer.js css-dialog.js dropzone.js toast.js
 scripts/
   build-standalone.mjs   builds dist/glyphary.html with esbuild
+  prepare-desktop.mjs    builds and copies the viewer into src-tauri/frontend
+  sync-desktop-version.mjs  keeps Cargo.toml and Cargo.lock on the package version
   screenshots.mjs        writes docs/*.png for both themes
+src-tauri/
+  tauri.conf.json        window, bundle and version configuration
+  src/main.rs            native shell and the save_export command
+  capabilities/          window permissions
+  icons/                 native icon set, generated from icon.svg
 bin/glyphary.mjs         the CLI
 tests/unit/              Vitest specs for parsing, exports, search and text
 tests/e2e/               Playwright specs, run in both themes
@@ -160,6 +228,10 @@ screenshots to force a palette.
 | `npm test`                        | Unit + end-to-end suites                             |
 | `npm run test:unit`               | Vitest                                               |
 | `npm run test:e2e`                | Playwright (each spec runs in light and dark)        |
+| `npm run desktop:dev`             | Rebuild the viewer and open the desktop app          |
+| `npm run desktop:build`           | Build the native installers                          |
+| `npm run desktop:frontend`        | Build and copy the viewer into `src-tauri/frontend`  |
+| `npm run desktop:icon`            | Regenerate the native icons from `icon.svg`          |
 | `npm run shots`                   | Regenerate `docs/*.png`                              |
 
 The end-to-end suite drives the built artifact through `file://` with your installed Chrome
