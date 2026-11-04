@@ -75,15 +75,29 @@ node bin/glyphary.mjs --help
 | Option           | Command                                             | Good for                                                                                     |
 | ---------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | Single HTML file | `npm run build`, then share `dist/glyphary.html`    | Zero install; Slack, Drive, a GitHub Release asset                                           |
-| Tarball          | `npm pack` → `glyphary-1.0.0.tgz`                   | Teammates run `npx ./glyphary-1.0.0.tgz`, or `npm i -g ./glyphary-1.0.0.tgz` then `glyphary` |
+| Tarball          | `npm pack` → `glyphary-0.1.1.tgz`                   | Teammates run `npx ./glyphary-0.1.1.tgz`, or `npm i -g ./glyphary-0.1.1.tgz` then `glyphary` |
 | Private registry | `npm publish` (see `.github/workflows/release.yml`) | Versioned installs from GitHub Packages or an internal registry                              |
 
 ```bash
 npm pack                       # creates the tarball, prints its name
-npx ./glyphary-1.0.0.tgz        # run it straight from the tarball
-npm i -g ./glyphary-1.0.0.tgz   # or install the `glyphary` command globally
+npx ./glyphary-0.1.1.tgz        # run it straight from the tarball
+npm i -g ./glyphary-0.1.1.tgz   # or install the `glyphary` command globally
 glyphary --serve                # serve the viewer locally
 ```
+
+## Versioning
+
+Versions start at `0.1.0` and every release bumps the patch: `0.1.1`, `0.1.2` and
+so on. A tag is always `v` plus that version.
+
+```bash
+npm run release   # bumps the patch, commits, tags vX.Y.Z and pushes
+```
+
+That runs `npm version patch` (which refuses a dirty working tree) and then
+`git push --follow-tags`. The tag triggers `.github/workflows/release.yml`, which
+checks the tag against `package.json` with `scripts/check-version.mjs` and only
+then attaches `dist/glyphary.html` to the GitHub Release.
 
 ## Using it
 

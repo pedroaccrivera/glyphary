@@ -1,6 +1,6 @@
 {
   "name": "glyphary",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "Local icon font viewer: drop an SVG font, WOFF, WOFF2, TTF or OTF and read every glyph, code point and CSS rule.",
   "type": "module",
   "license": "MIT",
@@ -33,6 +33,7 @@
     "test": "npm run test:unit && npm run test:e2e",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
+    "release": "npm version patch -m \"Release %s\" && git push --follow-tags",
     "prepack": "npm run build"
   },
   "keywords": [
