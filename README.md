@@ -118,28 +118,36 @@ npm run desktop:build -- --target x86_64-pc-windows-msvc
 The app icon lives in `src-tauri/icons/icon.svg`; `npm run desktop:icon`
 re-renders it and regenerates the native icon set.
 
-### Unsigned builds
+### Signing and first launch
 
-The first releases are **not code-signed or notarized**. macOS Gatekeeper
-blocks a downloaded DMG on first launch: open **System Settings → Privacy &
-Security** and choose **Open Anyway**, or right-click the app and pick **Open**.
-On Windows, SmartScreen shows “Windows protected your PC”: choose **More info →
-Run anyway**. Signing (Apple Developer ID plus notarization, and a Windows
-code-signing certificate) can be added later without changing the app.
+The macOS bundles are **ad-hoc signed**, which keeps Gatekeeper from reporting
+the app as damaged, but they are **not notarized** with an Apple Developer ID.
+On first launch of a downloaded DMG, open **System Settings → Privacy &
+Security** and choose **Open Anyway**. If an older build says the app is
+damaged, clear the quarantine flag after copying it to Applications:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Glyphary.app
+```
+
+Windows builds are unsigned, so SmartScreen shows “Windows protected your PC”:
+choose **More info → Run anyway**. A Developer ID certificate plus notarization,
+and a Windows code-signing certificate, can be added later without changing the
+app.
 
 ## Distribution
 
-| Option           | Command                                             | Good for                                                                                     |
-| ---------------- | --------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Desktop app      | `npm run desktop:build`                             | macOS `.dmg` and Windows `.msi`/`.exe`; no browser, no Node                                  |
-| Single HTML file | `npm run build`, then share `dist/glyphary.html`    | Zero install; Slack, Drive, a GitHub Release asset                                           |
-| Tarball          | `npm pack` → `glyphary-0.2.0.tgz`                   | Teammates run `npx ./glyphary-0.2.0.tgz`, or `npm i -g ./glyphary-0.2.0.tgz` then `glyphary` |
-| Private registry | `npm publish` (see `.github/workflows/release.yml`) | Versioned installs from GitHub Packages or an internal registry                              |
+| Option           | Command                                             | Good for                                                                              |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Desktop app      | `npm run desktop:build`                             | macOS `.dmg` and Windows `.msi`/`.exe`; no browser, no Node                           |
+| Single HTML file | `npm run build`, then share `dist/glyphary.html`    | Zero install; Slack, Drive, a GitHub Release asset                                    |
+| Tarball          | `npm pack` → `glyphary-<version>.tgz`               | Teammates run `npx ./glyphary-<version>.tgz`, or install it globally, then `glyphary` |
+| Private registry | `npm publish` (see `.github/workflows/release.yml`) | Versioned installs from GitHub Packages or an internal registry                       |
 
 ```bash
-npm pack                       # creates the tarball, prints its name
-npx ./glyphary-0.2.0.tgz        # run it straight from the tarball
-npm i -g ./glyphary-0.2.0.tgz   # or install the `glyphary` command globally
+npm pack                        # creates the tarball, prints its name
+npx ./glyphary-<version>.tgz    # run it straight from the tarball
+npm i -g ./glyphary-<version>.tgz # or install the `glyphary` command globally
 glyphary --serve                # serve the viewer locally
 ```
 

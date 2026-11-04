@@ -92,6 +92,13 @@ jobs:
       - name: Build the installers
         run: npm run desktop:build -- --target ${{ matrix.target }}
 
+      - name: Verify the macOS signature
+        if: runner.os == 'macOS'
+        run: |
+          APP=$(find "src-tauri/target/${{ matrix.target }}/release/bundle/macos" -maxdepth 1 -name '*.app' -print -quit)
+          test -n "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+
       - uses: actions/upload-artifact@v7
         with:
           name: desktop-${{ matrix.name }}
